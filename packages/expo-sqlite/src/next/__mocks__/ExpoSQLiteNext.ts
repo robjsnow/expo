@@ -1,8 +1,8 @@
 import assert from 'assert';
 import sqlite3 from 'better-sqlite3';
 
-import { OpenOptions } from '../NativeDatabase';
-import { BindParams, ColumnValues, RunResult } from '../NativeStatement';
+import { SQLiteOpenOptions } from '../NativeDatabase';
+import { SQLiteBindParams, SQLiteColumnNames, SQLiteRunResult } from '../NativeStatement';
 
 export default {
   get name(): string {
@@ -13,7 +13,9 @@ export default {
 
   NativeDatabase: jest
     .fn()
-    .mockImplementation((dbName: string, options?: OpenOptions) => new NativeDatabase(dbName)),
+    .mockImplementation(
+      (dbName: string, options?: SQLiteOpenOptions) => new NativeDatabase(dbName)
+    ),
 
   NativeStatement: jest.fn().mockImplementation(() => new NativeStatement()),
 };
@@ -69,38 +71,38 @@ class NativeDatabase {
 class NativeStatement {
   public sqlite3Stmt: sqlite3.Statement | null = null;
   private iterator: ReturnType<sqlite3.Statement['iterate']> | null = null;
-  private iteratorParams: BindParams = [];
+  private iteratorParams: SQLiteBindParams = [];
 
   //#region Asynchronous API
 
   public arrayRunAsync = jest
     .fn()
     .mockImplementation(
-      (database: NativeDatabase, params: BindParams): Promise<RunResult> =>
+      (database: NativeDatabase, params: SQLiteBindParams): Promise<SQLiteRunResult> =>
         Promise.resolve(this._run(normalizeParams(params)))
     );
   public objectRunAsync = jest
     .fn()
     .mockImplementation(
-      (database: NativeDatabase, params: BindParams): Promise<RunResult> =>
+      (database: NativeDatabase, params: SQLiteBindParams): Promise<SQLiteRunResult> =>
         Promise.resolve(this._run(normalizeParams(params)))
     );
   public arrayGetAsync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams): Promise<any> => {
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams): Promise<any> => {
       assert(this.sqlite3Stmt);
       if (this.iterator == null) {
         this.iteratorParams = normalizeParams(params);
         this.iterator = this.sqlite3Stmt.iterate(this.iteratorParams);
       }
       const result = this.iterator.next();
-      const columnValues =
+      const columnNames =
         result.done === false ? Object.values(result.value as Record<string, any>) : null;
-      return Promise.resolve(columnValues);
+      return Promise.resolve(columnNames);
     });
   public objectGetAsync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams): Promise<any> => {
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams): Promise<any> => {
       assert(this.sqlite3Stmt);
       if (this.iterator == null) {
         this.iteratorParams = normalizeParams(params);
@@ -113,12 +115,12 @@ class NativeStatement {
     });
   public arrayGetAllAsync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams) =>
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams) =>
       Promise.resolve(this._allValues(normalizeParams(params)))
     );
   public objectGetAllAsync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams) =>
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams) =>
       Promise.resolve(this._allValues(normalizeParams(params)))
     );
   public getColumnNamesAsync = jest.fn().mockImplementation(async (database: NativeDatabase) => {
@@ -139,18 +141,18 @@ class NativeStatement {
   public arrayRunSync = jest
     .fn()
     .mockImplementation(
-      (database: NativeDatabase, params: BindParams): RunResult =>
+      (database: NativeDatabase, params: SQLiteBindParams): SQLiteRunResult =>
         this._run(normalizeParams(params))
     );
   public objectRunSync = jest
     .fn()
     .mockImplementation(
-      (database: NativeDatabase, params: BindParams): RunResult =>
+      (database: NativeDatabase, params: SQLiteBindParams): SQLiteRunResult =>
         this._run(normalizeParams(params))
     );
   public arrayGetSync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams): any => {
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams): any => {
       assert(this.sqlite3Stmt);
       if (this.iterator == null) {
         this.iteratorParams = normalizeParams(params);
@@ -163,7 +165,7 @@ class NativeStatement {
     });
   public objectGetSync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams): any => {
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams): any => {
       assert(this.sqlite3Stmt);
       if (this.iterator == null) {
         this.iteratorParams = normalizeParams(params);
@@ -176,12 +178,12 @@ class NativeStatement {
     });
   public arrayGetAllSync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams) =>
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams) =>
       this._allValues(normalizeParams(params))
     );
   public objectGetAllSync = jest
     .fn()
-    .mockImplementation((database: NativeDatabase, params: BindParams) =>
+    .mockImplementation((database: NativeDatabase, params: SQLiteBindParams) =>
       this._allValues(normalizeParams(params))
     );
   public getColumnNamesSync = jest.fn().mockImplementation((database: NativeDatabase) => {
@@ -197,16 +199,16 @@ class NativeStatement {
 
   //#endregion
 
-  private _run = (...params: any[]): RunResult => {
+  private _run = (...params: any[]): SQLiteRunResult => {
     assert(this.sqlite3Stmt);
     const result = this.sqlite3Stmt.run(...params);
     return {
-      lastInsertRowId: Number(result.lastInsertRowId),
+      lastInsertRowId: Number(result.lastInsertRowid),
       changes: result.changes,
     };
   };
 
-  private _allValues = (...params: any[]): ColumnValues[] => {
+  private _allValues = (...params: any[]): SQLiteColumnNames[] => {
     assert(this.sqlite3Stmt);
     const sqlite3Stmt = this.sqlite3Stmt as any;
     return sqlite3Stmt.all(...params).map((row: any) => Object.values(row));
@@ -227,7 +229,7 @@ class NativeStatement {
 
 //#endregion
 
-function normalizeParams(params: BindParams): BindParams {
+function normalizeParams(params: SQLiteBindParams): SQLiteBindParams {
   const isArray = Array.isArray(params);
 
   if (isArray && params.length === 1 && params[0] === undefined) {
@@ -235,7 +237,7 @@ function normalizeParams(params: BindParams): BindParams {
   }
 
   if (!isArray && typeof params === 'object') {
-    const result: BindParams = {};
+    const result: SQLiteBindParams = {};
     for (const [key, value] of Object.entries(params)) {
       const normalizedKey = key.replace(/^[:@$]/, '');
       result[normalizedKey] = value;

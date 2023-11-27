@@ -1,7 +1,7 @@
 /**
  * Result of a `runAsync` call.
  */
-export interface RunResult {
+export interface SQLiteRunResult {
   /**
    * The last inserted row ID.
    */
@@ -40,13 +40,13 @@ export interface RunResult {
  * await statement.getAsync({ $value: 'test1', $intValue: 789 });
  * ```
  */
-export type BindValue = string | number | null | boolean;
-export type BindParams = Record<string, BindValue> | BindValue[];
-export type VariadicBindParams = BindValue[];
+export type SQLiteBindValue = string | number | null | boolean;
+export type SQLiteBindParams = Record<string, SQLiteBindValue> | SQLiteBindValue[];
+export type SQLiteVariadicBindParams = SQLiteBindValue[];
 
-export type ColumnNames = string[];
-export type ColumnValues = any[];
-type AnyDatabase = any;
+export type SQLiteColumnNames = string[];
+export type SQLiteColumnValues = any[];
+type SQLiteAnyDatabase = any;
 
 /**
  * A class that represents an instance of the SQLite statement.
@@ -54,43 +54,67 @@ type AnyDatabase = any;
 export declare class NativeStatement {
   //#region Asynchronous API
 
-  public arrayRunAsync(database: AnyDatabase, params: BindParams): Promise<RunResult>;
-  public objectRunAsync(database: AnyDatabase, params: BindParams): Promise<RunResult>;
+  public arrayRunAsync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): Promise<SQLiteRunResult>;
+  public objectRunAsync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): Promise<SQLiteRunResult>;
 
   public arrayGetAsync(
-    database: AnyDatabase,
-    params: BindParams
-  ): Promise<ColumnValues | null | undefined>;
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): Promise<SQLiteColumnValues | null | undefined>;
   public objectGetAsync(
-    database: AnyDatabase,
-    params: BindParams
-  ): Promise<ColumnValues | null | undefined>;
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): Promise<SQLiteColumnValues | null | undefined>;
 
-  public arrayGetAllAsync(database: AnyDatabase, params: BindParams): Promise<ColumnValues[]>;
-  public objectGetAllAsync(database: AnyDatabase, params: BindParams): Promise<ColumnValues[]>;
+  public arrayGetAllAsync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): Promise<SQLiteColumnValues[]>;
+  public objectGetAllAsync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): Promise<SQLiteColumnValues[]>;
 
-  public getColumnNamesAsync(): Promise<ColumnNames>;
+  public getColumnNamesAsync(): Promise<SQLiteColumnNames>;
 
-  public resetAsync(database: AnyDatabase): Promise<void>;
-  public finalizeAsync(database: AnyDatabase): Promise<void>;
+  public resetAsync(database: SQLiteAnyDatabase): Promise<void>;
+  public finalizeAsync(database: SQLiteAnyDatabase): Promise<void>;
 
   //#endregion
 
   //#region Synchronous API
 
-  public arrayRunSync(database: AnyDatabase, params: BindParams): RunResult;
-  public objectRunSync(database: AnyDatabase, params: BindParams): RunResult;
+  public arrayRunSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteRunResult;
+  public objectRunSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteRunResult;
 
-  public arrayGetSync(database: AnyDatabase, params: BindParams): ColumnValues | null | undefined;
-  public objectGetSync(database: AnyDatabase, params: BindParams): ColumnValues | null | undefined;
+  public arrayGetSync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): SQLiteColumnValues | null | undefined;
+  public objectGetSync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): SQLiteColumnValues | null | undefined;
 
-  public arrayGetAllSync(database: AnyDatabase, params: BindParams): ColumnValues[];
-  public objectGetAllSync(database: AnyDatabase, params: BindParams): ColumnValues[];
+  public arrayGetAllSync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): SQLiteColumnValues[];
+  public objectGetAllSync(
+    database: SQLiteAnyDatabase,
+    params: SQLiteBindParams
+  ): SQLiteColumnValues[];
 
   public getColumnNamesSync(): string[];
 
-  public resetSync(database: AnyDatabase): void;
-  public finalizeSync(database: AnyDatabase): void;
+  public resetSync(database: SQLiteAnyDatabase): void;
+  public finalizeSync(database: SQLiteAnyDatabase): void;
 
   //#endregion
 }

@@ -256,7 +256,7 @@ class SQLiteModuleNext : Module() {
   }
 
   @Throws(AccessClosedResourceException::class, InvalidConvertibleException::class, SQLiteErrorException::class)
-  private fun arrayGet(statement: NativeStatement, database: NativeDatabase, bindParams: List<Any>): ColumnValues? {
+  private fun arrayGet(statement: NativeStatement, database: NativeDatabase, bindParams: List<Any>): SQLiteColumnValues? {
     maybeThrowForClosedDatabase(database)
     maybeThrowForFinalizedStatement(statement)
     for ((index, param) in bindParams.withIndex()) {
@@ -273,7 +273,7 @@ class SQLiteModuleNext : Module() {
   }
 
   @Throws(AccessClosedResourceException::class, InvalidConvertibleException::class, SQLiteErrorException::class)
-  private fun objectGet(statement: NativeStatement, database: NativeDatabase, bindParams: Map<String, Any>): ColumnValues? {
+  private fun objectGet(statement: NativeStatement, database: NativeDatabase, bindParams: Map<String, Any>): SQLiteColumnValues? {
     maybeThrowForClosedDatabase(database)
     maybeThrowForFinalizedStatement(statement)
     for ((name, param) in bindParams) {
@@ -293,13 +293,13 @@ class SQLiteModuleNext : Module() {
   }
 
   @Throws(AccessClosedResourceException::class, InvalidConvertibleException::class, SQLiteErrorException::class)
-  private fun arrayGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: List<Any>): List<ColumnValues> {
+  private fun arrayGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: List<Any>): List<SQLiteColumnValues> {
     maybeThrowForClosedDatabase(database)
     maybeThrowForFinalizedStatement(statement)
     for ((index, param) in bindParams.withIndex()) {
       statement.ref.bindStatementParam(index + 1, param)
     }
-    val columnValuesList = mutableListOf<ColumnValues>()
+    val columnValuesList = mutableListOf<SQLiteColumnValues>()
     while (true) {
       val ret = statement.ref.sqlite3_step()
       if (ret == NativeDatabaseBinding.SQLITE_ROW) {
@@ -314,7 +314,7 @@ class SQLiteModuleNext : Module() {
   }
 
   @Throws(AccessClosedResourceException::class, InvalidConvertibleException::class, SQLiteErrorException::class)
-  private fun objectGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: Map<String, Any>): List<ColumnValues> {
+  private fun objectGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: Map<String, Any>): List<SQLiteColumnValues> {
     maybeThrowForClosedDatabase(database)
     maybeThrowForFinalizedStatement(statement)
     for ((name, param) in bindParams) {
@@ -323,7 +323,7 @@ class SQLiteModuleNext : Module() {
         statement.ref.bindStatementParam(index, param)
       }
     }
-    val columnValuesList = mutableListOf<ColumnValues>()
+    val columnValuesList = mutableListOf<SQLiteColumnValues>()
     while (true) {
       val ret = statement.ref.sqlite3_step()
       if (ret == NativeDatabaseBinding.SQLITE_ROW) {

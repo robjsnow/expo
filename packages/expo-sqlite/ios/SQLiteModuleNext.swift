@@ -3,8 +3,8 @@
 import ExpoModulesCore
 import sqlite3
 
-private typealias ColumnNames = [String]
-private typealias ColumnValues = [Any]
+private typealias SQLiteColumnNames = [String]
+private typealias SQLiteColumnValues = [Any]
 private let SQLITE_TRANSIENT = unsafeBitCast(OpaquePointer(bitPattern: -1), to: sqlite3_destructor_type.self)
 private let MEMORY_DB_NAME = ":memory:"
 
@@ -128,38 +128,38 @@ public final class SQLiteModuleNext: Module {
         return try objectRun(statement: statement, database: database, bindParams: bindParams)
       }
 
-      AsyncFunction("arrayGetAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> ColumnValues? in
+      AsyncFunction("arrayGetAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> SQLiteColumnValues? in
         return try arrayGet(statement: statement, database: database, bindParams: bindParams)
       }
-      Function("arrayGetSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> ColumnValues? in
+      Function("arrayGetSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> SQLiteColumnValues? in
         return try arrayGet(statement: statement, database: database, bindParams: bindParams)
       }
 
-      AsyncFunction("objectGetAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> ColumnValues? in
+      AsyncFunction("objectGetAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> SQLiteColumnValues? in
         return try objectGet(statement: statement, database: database, bindParams: bindParams)
       }
-      Function("objectGetSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> ColumnValues? in
+      Function("objectGetSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> SQLiteColumnValues? in
         return try objectGet(statement: statement, database: database, bindParams: bindParams)
       }
 
-      AsyncFunction("arrayGetAllAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> [ColumnValues] in
+      AsyncFunction("arrayGetAllAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> [SQLiteColumnValues] in
         return try arrayGetAll(statement: statement, database: database, bindParams: bindParams)
       }
-      Function("arrayGetAllSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> [ColumnValues] in
+      Function("arrayGetAllSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) -> [SQLiteColumnValues] in
         return try arrayGetAll(statement: statement, database: database, bindParams: bindParams)
       }
 
-      AsyncFunction("objectGetAllAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> [ColumnValues] in
+      AsyncFunction("objectGetAllAsync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> [SQLiteColumnValues] in
         return try objectGetAll(statement: statement, database: database, bindParams: bindParams)
       }
-      Function("objectGetAllSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> [ColumnValues] in
+      Function("objectGetAllSync") { (statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) -> [SQLiteColumnValues] in
         return try objectGetAll(statement: statement, database: database, bindParams: bindParams)
       }
 
-      AsyncFunction("getColumnNamesAsync") { (statement: NativeStatement) -> ColumnNames in
+      AsyncFunction("getColumnNamesAsync") { (statement: NativeStatement) -> SQLiteColumnNames in
         return try getColumnNames(statement: statement)
       }
-      Function("getColumnNamesSync") { (statement: NativeStatement) -> ColumnNames in
+      Function("getColumnNamesSync") { (statement: NativeStatement) -> SQLiteColumnNames in
         return try getColumnNames(statement: statement)
       }
 
@@ -258,7 +258,7 @@ public final class SQLiteModuleNext: Module {
     ]
   }
 
-  private func arrayGet(statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) throws -> ColumnValues? {
+  private func arrayGet(statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) throws -> SQLiteColumnValues? {
     try maybeThrowForClosedDatabase(database)
     try maybeThrowForFinalizedStatement(statement)
     for (index, param) in bindParams.enumerated() {
@@ -274,7 +274,7 @@ public final class SQLiteModuleNext: Module {
     return nil
   }
 
-  private func objectGet(statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) throws -> ColumnValues? {
+  private func objectGet(statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) throws -> SQLiteColumnValues? {
     try maybeThrowForClosedDatabase(database)
     try maybeThrowForFinalizedStatement(statement)
     for (name, param) in bindParams {
@@ -293,13 +293,13 @@ public final class SQLiteModuleNext: Module {
     return nil
   }
 
-  private func arrayGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) throws -> [ColumnValues] {
+  private func arrayGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: [Any]) throws -> [SQLiteColumnValues] {
     try maybeThrowForClosedDatabase(database)
     try maybeThrowForFinalizedStatement(statement)
     for (index, param) in bindParams.enumerated() {
       try bindStatementParam(statement: statement, with: param, at: Int32(index + 1))
     }
-    var columnValuesList: [ColumnValues] = []
+    var columnValuesList: [SQLiteColumnValues] = []
     while true {
       let ret = sqlite3_step(statement.pointer)
       if ret == SQLITE_ROW {
@@ -313,7 +313,7 @@ public final class SQLiteModuleNext: Module {
     return columnValuesList
   }
 
-  private func objectGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) throws -> [ColumnValues] {
+  private func objectGetAll(statement: NativeStatement, database: NativeDatabase, bindParams: [String: Any]) throws -> [SQLiteColumnValues] {
     try maybeThrowForClosedDatabase(database)
     try maybeThrowForFinalizedStatement(statement)
     for (name, param) in bindParams {
@@ -322,7 +322,7 @@ public final class SQLiteModuleNext: Module {
         try bindStatementParam(statement: statement, with: param, at: index)
       }
     }
-    var columnValuesList: [ColumnValues] = []
+    var columnValuesList: [SQLiteColumnValues] = []
     while true {
       let ret = sqlite3_step(statement.pointer)
       if ret == SQLITE_ROW {
@@ -439,20 +439,20 @@ public final class SQLiteModuleNext: Module {
     contextPair.toOpaque())
   }
 
-  private func getColumnNames(statement: NativeStatement) throws -> ColumnNames {
+  private func getColumnNames(statement: NativeStatement) throws -> SQLiteColumnNames {
     try maybeThrowForFinalizedStatement(statement)
     let columnCount = Int(sqlite3_column_count(statement.pointer))
-    var columnNames: ColumnNames = Array(repeating: "", count: columnCount)
+    var columnNames: SQLiteColumnNames = Array(repeating: "", count: columnCount)
     for i in 0..<columnCount {
       columnNames[i] = String(cString: sqlite3_column_name(statement.pointer, Int32(i)))
     }
     return columnNames
   }
 
-  private func getColumnValues(statement: NativeStatement) throws -> ColumnValues {
+  private func getColumnValues(statement: NativeStatement) throws -> SQLiteColumnValues {
     try maybeThrowForFinalizedStatement(statement)
     let columnCount = Int(sqlite3_column_count(statement.pointer))
-    var columnValues: ColumnValues = Array(repeating: 0, count: columnCount)
+    var columnValues: SQLiteColumnValues = Array(repeating: 0, count: columnCount)
     for i in 0..<columnCount {
       columnValues[i] = try getColumnValue(statement: statement, at: Int32(i))
     }
