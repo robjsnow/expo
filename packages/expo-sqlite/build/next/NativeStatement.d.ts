@@ -1,11 +1,11 @@
 /**
  * Result of a `runAsync` call.
  */
-export interface RunResult {
+export interface SQLiteRunResult {
     /**
      * The last inserted row ID.
      */
-    lastInsertRowid: number;
+    lastInsertRowId: number;
     /**
      * The number of rows affected.
      */
@@ -38,34 +38,34 @@ export interface RunResult {
  * await statement.getAsync({ $value: 'test1', $intValue: 789 });
  * ```
  */
-export type BindValue = string | number | null | boolean;
-export type BindParams = Record<string, BindValue> | BindValue[];
-export type VariadicBindParams = BindValue[];
-export type ColumnNames = string[];
-export type ColumnValues = any[];
-type AnyDatabase = any;
+export type SQLiteBindValue = string | number | null | boolean;
+export type SQLiteBindParams = Record<string, SQLiteBindValue> | SQLiteBindValue[];
+export type SQLiteVariadicBindParams = SQLiteBindValue[];
+export type SQLiteColumnNames = string[];
+export type SQLiteColumnValues = any[];
+type SQLiteAnyDatabase = any;
 /**
  * A class that represents an instance of the SQLite statement.
  */
 export declare class NativeStatement {
-    arrayRunAsync(database: AnyDatabase, params: BindParams): Promise<RunResult>;
-    objectRunAsync(database: AnyDatabase, params: BindParams): Promise<RunResult>;
-    arrayGetAsync(database: AnyDatabase, params: BindParams): Promise<ColumnValues | null | undefined>;
-    objectGetAsync(database: AnyDatabase, params: BindParams): Promise<ColumnValues | null | undefined>;
-    arrayGetAllAsync(database: AnyDatabase, params: BindParams): Promise<ColumnValues[]>;
-    objectGetAllAsync(database: AnyDatabase, params: BindParams): Promise<ColumnValues[]>;
-    getColumnNamesAsync(): Promise<ColumnNames>;
-    resetAsync(database: AnyDatabase): Promise<void>;
-    finalizeAsync(database: AnyDatabase): Promise<void>;
-    arrayRunSync(database: AnyDatabase, params: BindParams): RunResult;
-    objectRunSync(database: AnyDatabase, params: BindParams): RunResult;
-    arrayGetSync(database: AnyDatabase, params: BindParams): ColumnValues | null | undefined;
-    objectGetSync(database: AnyDatabase, params: BindParams): ColumnValues | null | undefined;
-    arrayGetAllSync(database: AnyDatabase, params: BindParams): ColumnValues[];
-    objectGetAllSync(database: AnyDatabase, params: BindParams): ColumnValues[];
+    arrayRunAsync(database: SQLiteAnyDatabase, params: SQLiteBindParams): Promise<SQLiteRunResult>;
+    objectRunAsync(database: SQLiteAnyDatabase, params: SQLiteBindParams): Promise<SQLiteRunResult>;
+    arrayGetAsync(database: SQLiteAnyDatabase, params: SQLiteBindParams): Promise<SQLiteColumnValues | null | undefined>;
+    objectGetAsync(database: SQLiteAnyDatabase, params: SQLiteBindParams): Promise<SQLiteColumnValues | null | undefined>;
+    arrayGetAllAsync(database: SQLiteAnyDatabase, params: SQLiteBindParams): Promise<SQLiteColumnValues[]>;
+    objectGetAllAsync(database: SQLiteAnyDatabase, params: SQLiteBindParams): Promise<SQLiteColumnValues[]>;
+    getColumnNamesAsync(): Promise<SQLiteColumnNames>;
+    resetAsync(database: SQLiteAnyDatabase): Promise<void>;
+    finalizeAsync(database: SQLiteAnyDatabase): Promise<void>;
+    arrayRunSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteRunResult;
+    objectRunSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteRunResult;
+    arrayGetSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteColumnValues | null | undefined;
+    objectGetSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteColumnValues | null | undefined;
+    arrayGetAllSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteColumnValues[];
+    objectGetAllSync(database: SQLiteAnyDatabase, params: SQLiteBindParams): SQLiteColumnValues[];
     getColumnNamesSync(): string[];
-    resetSync(database: AnyDatabase): void;
-    finalizeSync(database: AnyDatabase): void;
+    resetSync(database: SQLiteAnyDatabase): void;
+    finalizeSync(database: SQLiteAnyDatabase): void;
 }
 export {};
 //# sourceMappingURL=NativeStatement.d.ts.map
