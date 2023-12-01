@@ -10,6 +10,8 @@
 
 ### 💡 Others
 
+- [iOS] Migrate to Expo Modules.
+
 ## 12.7.0 — 2023-11-14
 
 ### 🛠 Breaking changes
