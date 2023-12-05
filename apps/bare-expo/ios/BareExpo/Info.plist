@@ -46,6 +46,8 @@
 	<string>1696089354000816</string>
 	<key>FacebookDisplayName</key>
 	<string>Expo APIs</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
@@ -92,6 +94,10 @@
 	<string>Allow bare-expo to access your reminders</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Allow Expo projects to use data for tracking the user or the device</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>FontAwesome5_Regular.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

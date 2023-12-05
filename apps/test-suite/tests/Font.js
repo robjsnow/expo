@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as Font from 'expo-font';
 import { Platform } from 'react-native';
 
@@ -50,5 +51,15 @@ export async function test({ beforeEach, afterAll, describe, it, expect }) {
         expect(!!rule).toBe(true);
       }
     });
+
+    if (Platform.OS !== 'web' && Constants.expoConfig.slug === 'bare-expo') {
+      it(`isLoaded support support custom native fonts`, () => {
+        // react-native-vector-icons uses differnt font name on Android and iOS
+        const expectedName =
+          Platform.OS === 'android' ? 'FontAwesome5_Regular' : 'FontAwesome5Free-Regular';
+        expect(Font.isLoaded(expectedName)).toBe(true);
+        expect(Font.isLoaded('NonExistedFont')).toBe(false);
+      });
+    }
   });
 }
