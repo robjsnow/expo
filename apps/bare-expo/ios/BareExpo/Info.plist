@@ -46,8 +46,6 @@
 	<string>1696089354000816</string>
 	<key>FacebookDisplayName</key>
 	<string>Expo APIs</string>
-	<key>LSApplicationCategoryType</key>
-	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
